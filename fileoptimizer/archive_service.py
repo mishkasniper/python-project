@@ -1,10 +1,12 @@
 """Сервис для создания архивов."""
 
+import zipfile
 from pathlib import Path
 
-from fileoptimizer.exceptions import UnsupportedFormatError
+from fileoptimizer.exceptions import ArchiveCreationError, UnsupportedFormatError
+from fileoptimizer.models import ArchiveResult, SizeInfo
 from fileoptimizer.storage import StorageService
-from fileoptimizer.utils import get_file_size
+from fileoptimizer.utils import calculate_saved_percent, get_file_size
 
 
 SUPPORTED_ARCHIVE_FORMATS = {"zip", "tar", "tar.gz"}
@@ -80,3 +82,75 @@ class ArchiveService:
     def _get_total_size(input_paths: list[Path]) -> int:
         """Возвращает общий размер исходных файлов."""
         return sum(get_file_size(path) for path in input_paths)
+
+    @staticmethod
+    def _create_zip_archive(input_paths: list[Path], output_path: Path) -> None:
+        """Создаёт ZIP-архив из списка файлов."""
+        with zipfile.ZipFile(
+            output_path,
+            mode="w",
+            compression=zipfile.ZIP_DEFLATED,
+        ) as archive:
+            for input_path in input_paths:
+                archive.write(input_path, arcname=input_path.name)
+
+    def create_archive(
+        self,
+        input_paths: list[Path],
+        output_dir: Path,
+        archive_name: str = "archive",
+        archive_format: str = "zip",
+    ) -> ArchiveResult:
+        """Создаёт архив из списка файлов.
+
+        Args:
+            input_paths: Список файлов для архивации.
+            output_dir: Папка для сохранения архива.
+            archive_name: Имя создаваемого архива.
+            archive_format: Формат архива. В этом коммите поддерживается zip.
+
+        Returns:
+            Информация о созданном архиве.
+
+        Raises:
+            FileNotFoundError: Если один из файлов не найден.
+            ValueError: Если список файлов пустой или путь не является файлом.
+            UnsupportedFormatError: Если формат архива не поддерживается.
+            ArchiveCreationError: Если произошла ошибка при создании архива.
+        """
+        archive_format = self._normalize_archive_format(archive_format)
+
+        self._validate_input_paths(input_paths)
+
+        output_path = self.build_archive_path(
+            output_dir=output_dir,
+            archive_name=archive_name,
+            archive_format=archive_format,
+        )
+
+        original_size = self._get_total_size(input_paths)
+
+        try:
+            self._create_zip_archive(
+                input_paths=input_paths,
+                output_path=output_path,
+            )
+        except OSError as error:
+            raise ArchiveCreationError("Problems with archive creation.") from error
+
+        processed_size = get_file_size(output_path)
+
+        return ArchiveResult(
+            output_path=output_path,
+            size_info=SizeInfo(
+                original_size=original_size,
+                processed_size=processed_size,
+                saved_percent=calculate_saved_percent(
+                    original_size=original_size,
+                    processed_size=processed_size,
+                ),
+            ),
+            archive_format=archive_format,
+            files_count=len(input_paths),
+        )
+    
