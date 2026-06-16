@@ -2,6 +2,8 @@ from pathlib import Path
 
 from PIL import Image, ImageEnhance, ImageOps
 
+from fileoptimizer.models import ImageOptimizeResult, SizeInfo
+from fileoptimizer.utils import calculate_saved_percent, get_file_size
 from fileoptimizer.exceptions import OptimizationError, UnsupportedFormatError
 
 
@@ -114,7 +116,7 @@ class ImageOptimizer:
             return image.convert("RGBA")
 
         return image
-    
+
     @staticmethod
     def resize_keep_aspect_ratio(
         image: Image.Image,
@@ -165,25 +167,28 @@ class ImageOptimizer:
         contrast_factor: float = 1.0,
         sharpness_factor: float = 1.0,
         brightness_factor: float = 1.0,
-    ) -> Path:
-        """Оптимизирует фотографию и сохраняет результат.
+    ) -> ImageOptimizeResult:
+        """Оптимизирует изображение и сохраняет результат.
         
         Args:
             input_path: Путь к исходной фотографии.
-            output_dir: Путь к папке для сохраненния результата.
-            output_format: Формат сохраненной фотографии. ["webp", "jpg", "png", "jpeg"]
+            output_dir: Путь к папке для сохранения результата.
+            output_format: Формат сохраненного изображения: webp, jpg, png, jpeg.
             quality: Качество сжатия для JPG и WebP. 1 <= quality <= 100.
             max_width: Максимальная ширина.
             max_height: Максимальная высота.
-            contrast_factor: Изменение контраста. 0.5 <= factor <= 2.0
-            sharpness_factor: Изменение остроты. 0.5 <= factor <= 2.0
-            brightness_factor: Изменение яркости. 0.5 <= factor <= 2.0
+            contrast_factor: Коэффициент контраста. 0.5 <= factor <= 2.0 (1 - без изменений)
+            sharpness_factor: Коэффициент остроты. 0.5 <= factor <= 2.0 (1 - без изменений)
+            brightness_factor: Коэффициент яркости. 0.5 <= factor <= 2.0 (1 - без изменений)
 
         Raises:
             FileNotFoundError: Если исходный файл не найден.
             ValueError: Если путь не является файлом или параметры некорректны.
             UnsupportedFormatError: Если входной или выходной формат не поддерживается.
             OptimizationError: Если произошла ошибка при обработке изображения.
+
+        Returns:
+            Информация о сохранённом изображении и статистике оптимизации.
         """ 
         output_format = self._validate_optimize_params(
             input_path=input_path,
@@ -204,6 +209,9 @@ class ImageOptimizer:
             output_format=output_format,
         )
 
+        result_width = 0
+        result_height = 0
+        original_size = get_file_size(input_path)
         try:
             with Image.open(input_path) as image:
                 processed_image = ImageOps.exif_transpose(image)
@@ -226,6 +234,9 @@ class ImageOptimizer:
                     output_format=output_format,
                 )
 
+                result_width = processed_image.width
+                result_height = processed_image.height
+
                 pillow_format = self.get_pillow_save_format(output_format)
                 save_options = self.get_save_options(output_format, quality)
 
@@ -238,5 +249,18 @@ class ImageOptimizer:
         except OSError as error:
             raise OptimizationError("Problems with optimization.") from error
 
-        return output_path
-        
+        processed_size = get_file_size(output_path)
+        return ImageOptimizeResult(
+            output_path=output_path,
+            size_info=SizeInfo(
+                original_size=original_size,
+                processed_size=processed_size,
+                saved_percent=calculate_saved_percent(
+                    original_size=original_size,
+                    processed_size=processed_size,
+                ),
+            ),
+            output_format=output_format,
+            width=result_width,
+            height=result_height,
+        )
