@@ -96,6 +96,24 @@ class ImageOptimizer:
             return image.convert("RGBA")
 
         return image
+    
+    @staticmethod
+    def resize_keep_aspect_ratio(
+        image: Image.Image,
+        max_width: int | None = None,
+        max_height: int | None = None,
+    ) -> Image.Image:
+        """Изменяет размер изображения с сохранением пропорций."""
+        if max_width is None and max_height is None:
+            return image
+
+        target_width = max_width or image.width
+        target_height = max_height or image.height
+
+        resized_image = image.copy()
+        resized_image.thumbnail((target_width, target_height))
+
+        return resized_image
 
     def optimize(
         self,
@@ -157,7 +175,7 @@ class ImageOptimizer:
                 )
 
         except OSError as error:
-            raise OptimizationError("Problems with optimization.")
+            raise OptimizationError("Problems with optimization.") from error
 
         return output_path
         
