@@ -22,3 +22,13 @@ class ImageOptimizeResult:
     output_format: str
     width: int
     height: int
+
+
+@dataclass(frozen=True)
+class ArchiveResult:
+    """Результат создания архива."""
+
+    output_path: Path
+    size_info: SizeInfo
+    archive_format: str
+    files_count: int
