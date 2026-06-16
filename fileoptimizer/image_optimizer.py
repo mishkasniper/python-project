@@ -1,7 +1,8 @@
-import os
-import PIL
 from pathlib import Path
-from exceptions import UnsupportedFormatError
+
+from PIL import Image, ImageEnhance, ImageOps
+
+from exceptions import OptimizationError, UnsupportedFormatError
 
 
 SUPPORTED_INPUT_FORMATS = {"jpg", "jpeg", "png", "webp"}
@@ -18,7 +19,7 @@ class ImageOptimizer:
         output_format: str,
         quality: int,
     ) -> str:
-        """Проверяет параметра и возвращает их нормализованный вид."""
+        """Проверяет параметры и возвращает их нормализованный вид."""
         if not input_path.exists():
             raise FileNotFoundError(f"Input file does not exist: {input_path}")
 
@@ -82,6 +83,20 @@ class ImageOptimizer:
 
         return {}
 
+    @staticmethod
+    def prepare_image_for_format(
+        image: Image.Image,
+        output_format: str,
+    ) -> Image.Image:
+        """Подготавливает цветовой режим изображения для выбранного формата."""
+        if output_format == "jpg":
+            return image.convert("RGB")
+
+        if image.mode not in {"RGB", "RGBA"}:
+            return image.convert("RGBA")
+
+        return image
+
     def optimize(
         self,
         input_path: Path,
@@ -111,7 +126,6 @@ class ImageOptimizer:
             TODO: исключение при отсутсвии/проблемами с файлом.
             TODO: исключение при ошибки во время оптимизации.
         """ 
-
         output_format = self._validate_optimize_params(
             input_path=input_path,
             output_dir=output_dir,
@@ -119,7 +133,32 @@ class ImageOptimizer:
             quality=quality,
         )
 
+        output_path = self.build_output_path(
+            input_path=input_path,
+            output_dir=output_dir,
+            output_format=output_format,
+        )
 
+        try:
+            with Image.open(input_path) as image:
+                processed_image = ImageOps.exif_transpose(image)
+                processed_image = self.prepare_image_for_format(
+                    image=processed_image,
+                    output_format=output_format,
+                )
 
+                pillow_format = self.get_pillow_save_format(output_format)
+                save_options = self.get_save_options(output_format, quality)
+
+                processed_image.save(
+                    output_path,
+                    format=pillow_format,
+                    **save_options,
+                )
+
+        except OSError as error:
+            raise OptimizationError("Problems with optimization.")
+
+        return output_path
         
 
