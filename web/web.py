@@ -146,6 +146,7 @@ async def image_form(request: Request):
 
 
 @app.post("/image")
+
 async def process_image(
     request: Request,
     file: UploadFile = File(...),
@@ -157,7 +158,7 @@ async def process_image(
     sharpness: float = Form(1.0),
     brightness: float = Form(1.0),
 ):
-    """Обрабатывает загруженное изображение и выполняет оптимизацию."""
+    """Image optimizer."""
     try:
         logger.debug("process_image called")
         content = await file.read()
@@ -168,7 +169,8 @@ async def process_image(
         logger.debug(f"Created job_dir: {job_dir}")
         input_dir = storage_service.get_input_dir(job_dir)
 
-        temp_path = input_dir / file.filename
+        safe_name = storage_service.safe_filename(file.filename)
+        temp_path = input_dir / safe_name
         with open(temp_path, "wb") as f:
             f.write(content)
 
@@ -224,7 +226,7 @@ async def process_archive(
     archive_format: str = Form("zip"),
     archive_name: str = Form("archive"),
 ):
-    """Обрабатывает загруженные файлы и создаёт архив."""
+    """Archivator."""
     try:
         logger.debug("process_archive called")
         if not files or len(files) == 0:
@@ -244,7 +246,8 @@ async def process_archive(
                     status_code=413,
                     detail=f"File {uploaded_file.filename} too large",
                 )
-            file_path = input_dir / uploaded_file.filename
+            safe_name = storage_service.safe_filename(uploaded_file.filename)
+            file_path = input_dir / safe_name
             with open(file_path, "wb") as f:
                 f.write(content)
             input_paths.append(file_path)
