@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="{{ request.state.lang if request.state.lang else 'ru' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileOptimizer</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1><a href="/">FileOptimizer</a></h1>
+            <nav>
+                <a href="/image">{{ _("Optimize Image") }}</a>
+                <a href="/archive">{{ _("Create Archive") }}</a>
+            </nav>
+            <div class="lang-switcher">
+                <a href="/set_lang?lang=ru&redirect={{ request.url.path }}">RU</a>
+                |
+                <a href="/set_lang?lang=en&redirect={{ request.url.path }}">EN</a>
+            </div>
+        </div>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2026 FileOptimizer</p>
+    </footer>
+    <script src="/static/script.js"></script>
+</body>
+</html>

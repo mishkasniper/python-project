@@ -13,4 +13,4 @@ class StorageError(FileOptimizerError):
     """Raised when an error occurs while working with temporary file storage."""
 
 class ArchiveCreationError(FileOptimizerError):
-    """Raised when archieve creation fails."""
+    """Raised when archive creation fails."""

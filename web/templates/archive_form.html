@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ _("Create Archive") }}</h2>
+{% if error %}
+<div class="error">{{ error }}</div>
+{% endif %}
+<form action="/archive" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="files">{{ _("Select files") }}</label>
+        <input type="file" name="files" id="files" multiple required>
+    </div>
+
+    <div class="form-group">
+        <label for="archive_format">{{ _("Archive format") }}</label>
+        <select name="archive_format" id="archive_format">
+            <option value="zip">ZIP</option>
+            <option value="tar">TAR</option>
+            <option value="tar.gz">TAR.GZ</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="archive_name">{{ _("Archive name (without extension)") }}</label>
+        <input type="text" name="archive_name" id="archive_name" value="archive">
+    </div>
+
+    <button type="submit">{{ _("Create") }}</button>
+</form>
+{% endblock %}

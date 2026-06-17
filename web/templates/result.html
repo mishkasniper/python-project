@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ _("Result") }}</h2>
+<p>{{ _("Your file has been processed.") }}</p>
+
+<div class="result-info">
+    <p><strong>{{ _("File name") }}:</strong> {{ result_file }}</p>
+
+    {% if metadata %}
+        {% if result_type == "image" %}
+            <p><strong>{{ _("Original size") }}:</strong> {{ (metadata.original_size / 1024) | round(1) }} KB</p>
+            <p><strong>{{ _("Processed size") }}:</strong> {{ (metadata.processed_size / 1024) | round(1) }} KB</p>
+            <p><strong>{{ _("Saved") }}:</strong> {{ metadata.saved_percent }}%</p>
+            <p><strong>{{ _("Dimensions") }}:</strong> {{ metadata.width }} × {{ metadata.height }}</p>
+            <p><strong>{{ _("Output format") }}:</strong> {{ metadata.output_format }}</p>
+        {% elif result_type == "archive" %}
+            <p><strong>{{ _("Original size") }}:</strong> {{ (metadata.original_size / 1024) | round(1) }} KB</p>
+            <p><strong>{{ _("Archive size") }}:</strong> {{ (metadata.processed_size / 1024) | round(1) }} KB</p>
+            <p><strong>{{ _("Saved") }}:</strong> {{ metadata.saved_percent }}%</p>
+            <p><strong>{{ _("Files count") }}:</strong> {{ metadata.files_count }}</p>
+            <p><strong>{{ _("Archive format") }}:</strong> {{ metadata.archive_format }}</p>
+        {% endif %}
+    {% else %}
+        <p><strong>{{ _("Size") }}:</strong> {{ (file_size / 1024) | round(1) }} KB</p>
+    {% endif %}
+</div>
+
+<a href="/download/{{ job_id }}/{{ result_file }}" class="download-btn">{{ _("Download") }}</a>
+{% endblock %}
