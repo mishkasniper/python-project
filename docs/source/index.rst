@@ -6,9 +6,11 @@
 FileOptimizer documentation
 ===========================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+FileOptimizer - веб-приложение для оптимизации изображений и создания архивов. 
+Проект позволяет загрузить изображение, выбрать параметры обработки и скачать 
+оптимизированный файл. Также пользователь может загрузить несколько файлов и 
+создать архив в формате ZIP, TAR или TAR.GZ.
+
 
 
 .. toctree::

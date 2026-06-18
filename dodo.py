@@ -126,9 +126,10 @@ def task_clean_all():
 
 def task_build():
     """Build wheel distribution."""
+    static_files = [p for p in WEB_DIR.glob('static/**/*') if p.is_file()]
     return {
         'actions': [
-            'python -m build --wheel',
+            'python -m build',
         ],
         'task_dep': [
             'compile',
