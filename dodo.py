@@ -125,7 +125,7 @@ def task_clean_all():
 
 
 def task_build():
-    """Build wheel distribution."""
+    """Build wheel and source distributions."""
     static_files = [p for p in WEB_DIR.glob('static/**/*') if p.is_file()]
     return {
         'actions': [
@@ -134,13 +134,13 @@ def task_build():
         'task_dep': [
             'compile',
             'docs',
-            ],
+        ],
         'file_dep': [
             PROJECT_ROOT / 'pyproject.toml',
             *list(FILEOPTIMIZER_DIR.glob('**/*.py')),
             *list(WEB_DIR.glob('**/*.py')),
             *list(WEB_DIR.glob('templates/**/*')),
-            *list(WEB_DIR.glob('static/**/*')),
+            *static_files,
         ],
         'targets': [PROJECT_ROOT / 'dist'],
         'verbosity': 2,
