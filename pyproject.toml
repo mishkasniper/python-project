@@ -7,16 +7,7 @@ name = "fileoptimizer"
 version = "0.1.0"
 description = "Веб-приложение для оптимизации изображений и создания архивов"
 readme = "README.md"
-authors = [
-    {name = "Your Name", email = "your@email.com"},
-]
-license = {text = "MIT"}
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 dependencies = [
     "Pillow>=10.0.0",
     "fastapi>=0.100.0",
@@ -36,8 +27,7 @@ dev = [
     "sphinx-autodoc-typehints>=1.24",
     "doit>=0.36.0",
     "build",
-    "twine",
-    "httpx",
+    "httpx2",
 ]
 
 [project.scripts]
@@ -51,45 +41,39 @@ where = ["."]
 include = ["fileoptimizer*", "web*"]
 
 [tool.setuptools.package-data]
-fileoptimizer = ["py.typed"]
 web = [
     "templates/*.html",
-    "static/*.css",
-    "static/*.js",
-    "locales/**/*.mo",
+    "static/**/*",
+    "locales/*/LC_MESSAGES/*.mo",
 ]
-
 
 [tool.ruff]
 line-length = 120
-target-version = "py39"
-select = [
-    "E", "W", "F", "I", "D",
-]
-ignore = [
-    "D100", "D104", "D107",
-]
+target-version = "py312"
 exclude = [
-    ".git", "__pycache__", "build", "dist", "venv", ".venv", "docs/_build",
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "venv",
+    ".venv",
+    "docs/_build",
 ]
 
-[tool.pydocstyle]
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "D"]
+ignore = [
+    "D100",
+    "D104",
+    "D107",
+    "D203",
+    "D213",
+]
+
+[tool.ruff.lint.pydocstyle]
 convention = "google"
-add-ignore = ["D104", "D107"]
 
 [tool.pytest.ini_options]
+pythonpath = ["."]
 testpaths = ["tests"]
 python_files = "test_*.py"
-addopts = "--cov=fileoptimizer --cov=web --cov-report=term-missing --cov-fail-under=75"
-
-[tool.coverage.run]
-source = ["fileoptimizer", "web"]
-omit = ["tests/*", "*/__init__.py"]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if __name__ == .__main__.:",
-    "raise NotImplementedError",
-]

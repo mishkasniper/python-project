@@ -9,7 +9,6 @@ from fileoptimizer.models import ArchiveResult, SizeInfo
 from fileoptimizer.storage import StorageService
 from fileoptimizer.utils import calculate_saved_percent, get_file_size
 
-
 SUPPORTED_ARCHIVE_FORMATS = {"zip", "tar", "tar.gz"}
 
 
@@ -131,6 +130,7 @@ class ArchiveService:
             ValueError: Если список файлов пустой или путь не является файлом.
             UnsupportedFormatError: Если формат архива не поддерживается.
             ArchiveCreationError: Если произошла ошибка при создании архива.
+
         """
         archive_format = self._normalize_archive_format(archive_format)
 

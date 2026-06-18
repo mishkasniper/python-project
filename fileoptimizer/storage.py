@@ -75,6 +75,7 @@ class StorageService:
 
         Returns:
             Путь к скопированному файлу.
+
         """
         if not source_path.exists():
             raise FileNotFoundError(f"Source file does not exist: {source_path}")

@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 LOCALES_DIR = BASE_DIR / "locales"
-DOCS_DIR = BASE_DIR.parent / "docs" / "_build"
+DOCS_DIR = STATIC_DIR / 'docs'
 JOBS_BASE_DIR = Path("tmp/jobs")
 
 # Максимальный размер загружаемого файла (в байтах) - 50 МБ

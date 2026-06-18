@@ -23,6 +23,7 @@ from fileoptimizer.image_optimizer import ImageOptimizer
 from fileoptimizer.storage import StorageService
 
 from .config import (
+    DEFAULT_LANGUAGE,
     DOCS_DIR,
     JOBS_BASE_DIR,
     LANGUAGES,
@@ -30,7 +31,6 @@ from .config import (
     MAX_UPLOAD_SIZE,
     STATIC_DIR,
     TEMPLATES_DIR,
-    DEFAULT_LANGUAGE,
 )
 
 logging.basicConfig(level=logging.DEBUG)

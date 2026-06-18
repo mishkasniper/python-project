@@ -2,10 +2,9 @@ from pathlib import Path
 
 from PIL import Image, ImageEnhance, ImageOps
 
+from fileoptimizer.exceptions import OptimizationError, UnsupportedFormatError
 from fileoptimizer.models import ImageOptimizeResult, SizeInfo
 from fileoptimizer.utils import calculate_saved_percent, get_file_size
-from fileoptimizer.exceptions import OptimizationError, UnsupportedFormatError
-
 
 SUPPORTED_INPUT_FORMATS = {"jpg", "jpeg", "png", "webp"}
 SUPPORTED_OUTPUT_FORMATS = {"jpg", "jpeg", "png", "webp"}
@@ -169,7 +168,7 @@ class ImageOptimizer:
         brightness_factor: float = 1.0,
     ) -> ImageOptimizeResult:
         """Оптимизирует изображение и сохраняет результат.
-        
+
         Args:
             input_path: Путь к исходной фотографии.
             output_dir: Путь к папке для сохранения результата.
@@ -189,7 +188,8 @@ class ImageOptimizer:
 
         Returns:
             Информация о сохранённом изображении и статистике оптимизации.
-        """ 
+
+        """
         output_format = self._validate_optimize_params(
             input_path=input_path,
             output_dir=output_dir,
@@ -198,7 +198,7 @@ class ImageOptimizer:
         )
 
         self._validate_resize_params(max_width, max_height)
-        
+
         self._validate_enhancement_factor("contrast_factor", contrast_factor)
         self._validate_enhancement_factor("sharpness_factor", sharpness_factor)
         self._validate_enhancement_factor("brightness_factor", brightness_factor)

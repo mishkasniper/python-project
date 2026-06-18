@@ -13,3 +13,8 @@ __pycache__/
 .ruff_cache/
 *.db
 .coverage
+.doit.db
+*.egg-info/
+web/static/docs/
+docs/_doctrees/
+docs/_build/
